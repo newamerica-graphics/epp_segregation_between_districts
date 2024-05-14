@@ -1,8 +1,28 @@
 .na-dataviz {
-  background-color: #efefef;
-  padding: 20px;
   a {
     font-weight: normal;
     color: #209B93;
+  }
+
+  .iframe-wrapper {
+    iframe {
+      width: 100%;
+      height: calc(100vh - 100px);
+      transition: all 0.2s ease-in-out;
+      border: 1px solid #c0c0c0;
+    }
+  
+    &.out-of-frame {
+      opacity: 0.5;
+      iframe {
+        pointer-events: none;
+        transform: scale(.8);
+        border: 1.25px solid #404040;
+        @media (min-width: 650px) {
+          transform: scale(.54);
+          border: 1.85px solid #404040;
+        }
+      }
+    }
   }
 }

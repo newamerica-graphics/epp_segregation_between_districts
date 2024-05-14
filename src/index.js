@@ -1,28 +1,61 @@
 import './index.scss';
 
-let queue = [];
-let data = null;
-
 const settings = {
   'viz__id': (el) => {
-    // use data
+    let target = document.createElement("div")
+    target.classList.add("iframe-wrapper")
+    el.appendChild(target)
+
+    let iframe = document.createElement("iframe")
+    iframe.src = "https://storymaps.arcgis.com/stories/a046ae47d9c5459a8f6e2c26f680ef54?cover=false"
+    target.appendChild(iframe)
+
+    const scrollTargetIntoView = () => {
+      target.scrollIntoView({block: "start", inline: "nearest", behavior: "smooth"})
+    }
+    
+    // Pulled from https://pqina.nl/blog/applying-styles-based-on-the-user-scroll-position-with-smart-css/
+    // The debounce function receives our function as a parameter
+    const debounce = (fn) => {
+        // This holds the requestAnimationFrame reference, so we can cancel it if we wish
+        let frame;
+    
+        // The debounce function returns a new function that can receive a variable number of arguments
+        return (...params) => {
+            // If the frame variable has been defined, clear it now, and queue for next frame
+            if (frame) {
+                cancelAnimationFrame(frame);
+            }
+    
+            // Queue our function call for the next frame
+            frame = requestAnimationFrame(() => {
+                // Call our function and pass any params we received
+                fn(...params);
+            });
+        };
+    };
+    
+    const iframeFocus = () => {
+      // console.log(target.getBoundingClientRect().y)
+      if((target.getBoundingClientRect().y < 100) && (target.getBoundingClientRect().y >= -1)) {
+        target.classList.remove("out-of-frame");
+      } else {
+        target.classList.add("out-of-frame");
+      }
+    };
+    
+    document.addEventListener('scroll', debounce(iframeFocus));
+    target.addEventListener('click', scrollTargetIntoView)
+    target.addEventListener('focusin', scrollTargetIntoView)
+          
+    iframeFocus();    
   }
 };
 
-fetch('endpoint').then(response => response.json()).then((_data)=>{
-  data = _data;
-  for(let i=0; i<queue.length; i++)
-    queue[i]();
-});
 
 window.renderDataViz = function(el){
   let id = el.getAttribute('id');
   let chart = settings[id];
   if(!chart) return;
-
-  if(data){
-    chart(el);
-  } else {
-    queue.push(() => chart(el));
-  }
+  chart(el);
 }
