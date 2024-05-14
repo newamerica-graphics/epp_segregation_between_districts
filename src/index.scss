@@ -14,6 +14,10 @@
   
     &.out-of-frame {
       opacity: 0.5;
+      cursor: pointer;
+      &:hover {
+        opacity: 1;
+      }
       iframe {
         pointer-events: none;
         transform: scale(.8);
